@@ -4,17 +4,15 @@ services:
     image: nginx:latest
     ports:
       - "80:80"
-    
-
+     networks:
+      - weather-network
   api:
     image: your-api-image:latest
     ports:
       - "5000:5000"
     depends_on:
       - db
-    networks:
-      - weather-network
-
+   
   db:
     image: postgres:latest
     environment:
