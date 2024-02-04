@@ -1,1 +1,36 @@
-created first file
+version: '3'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:/usr/share/nginx/html
+    networks:
+      - restaurant-network
+
+  api:
+    image: your-api-image:latest
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - restaurant-network
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: restaurant_db
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_password
+    volumes:
+      - restaurant-db-data:/var/lib/postgresql/data
+    networks:
+      - restaurant-network
+
+networks:
+  restaurant-network:
+
+volumes:
+  restaurant-db-data:
