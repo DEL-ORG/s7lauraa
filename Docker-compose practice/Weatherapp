@@ -1,0 +1,101 @@
+#fertig gemacht
+version: "3"
+
+services:
+  db:
+    image: mysql:8.0.2 #devopseasylearning/tarzan-db:v0.0.1
+    container_name: db
+    environment:
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+    expose:
+      - "3306"
+    ports:
+      - "6666:3306"
+    volumes: 
+      - my-db:/var/lib/mysql
+    networks: 
+      - tarzan-network
+    restart: always
+
+
+  redis: 
+    container_name: redis
+    image: redis:latest
+    networks:
+      - tarzan-network
+    environment:
+      - REDIS_USER=redis
+      - REDIS_PASSWORD=redis
+    volumes: 
+      - my-redis:/data
+    restart: always
+    expose:
+      - "6379"
+    ports:
+      - "9999:6379"
+    depends_on:
+      - ui
+  
+
+  weather: 
+    image:  devopseasylearning/tarzan-weather:v0.0.1
+    container_name: weather
+    environment: 
+      APIKEY: ecbc396f46mshb65cbb1f82cf334p1fcc87jsna5e962a3c542
+    expose:
+      - "5000"
+    ports:
+      - "5555:5000"
+    networks:  
+      - tarzan-network
+    #depends_on:
+     # - db)
+      #- redis
+    restart: always
+
+  auth: 
+    image: devopseasylearning/tarzan-auth:v0.0.1
+    container_name: auth
+    environment:
+      DB_HOST: db
+      DB_PASSWORD: my-secret-pw
+      #DB_USER: root 
+    expose:
+      - "8080"
+    ports:
+      - "8888:8080"
+    networks:   
+      - tarzan-network
+    depends_on:
+      - db
+    restart: always
+
+  ui: 
+    image: devopseasylearning/tarzan-ui:v0.0.1
+    container_name: ui
+    expose:
+      - "3000"
+    ports:
+      - "30001:3000"
+    networks:  
+      - tarzan-network
+    depends_on: 
+      - auth
+    
+    environment:
+      AUTH_host: auth
+      AUTH_PORT: "8080"
+      WEATHER_HOST: weather
+      WEATHER_PORT: "5000"
+      REDIS_USER: redis
+      REDIS_PASSWORD: redis
+    restart: always
+
+
+networks:
+  tarzan-network:
+    driver: bridge
+
+volumes:
+  my-db:
+  my-redis:
