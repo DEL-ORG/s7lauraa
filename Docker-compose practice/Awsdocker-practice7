@@ -1,0 +1,23 @@
+# Use a base image with Python already installed
+FROM python:latest
+
+# Set the working directory inside the container
+WORKDIR /usr/app
+
+# Copy requirements.txt to the working directory
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip3 install -r requirements.txt
+
+# Expose a port to communicate with the container
+EXPOSE 3000
+
+# Copy the application code into the container
+COPY . .
+
+# Define a volume for persisting data
+VOLUME /app/data
+
+# Define the command to run when the container starts
+CMD ["python3", "app.py"]
